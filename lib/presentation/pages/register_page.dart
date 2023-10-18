@@ -37,7 +37,7 @@ class _RegisterPageState extends State<RegisterPage> {
         listener: (context, state) {
           if (state is AuthSuccess) {
             Navigator.pushNamedAndRemoveUntil(
-                context, '/home', (route) => false);
+                context, '/main', (route) => false);
           }
           if (state is AuthFailed) {
             AppMethods.dangerFlushbar(context, state.e);

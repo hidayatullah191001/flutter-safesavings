@@ -38,10 +38,11 @@ class _LoginPageState extends State<LoginPage> {
         listener: (context, state) {
           if (state is AuthSuccess) {
             Navigator.pushNamedAndRemoveUntil(
-                context, '/home', (route) => false);
+                context, '/main', (route) => false);
           }
           if (state is AuthFailed) {
-            AppMethods.dangerFlushbar(context, state.e);
+            AppMethods.dangerFlushbar(
+                context, 'Something went wrong! Please try again');
           }
         },
         builder: (context, state) {
@@ -106,12 +107,14 @@ class _LoginPageState extends State<LoginPage> {
                                 controller: emailController,
                                 title: 'Email',
                                 hintText: 'Masukkan email...',
+                                enabled: state is AuthLoading ? false : true,
                               ),
                               CustomInputForm(
                                 controller: passwordController,
                                 title: 'Password',
                                 hintText: 'Masukkan password...',
                                 obsecureText: true,
+                                enabled: state is AuthLoading ? false : true,
                               ),
                               Center(
                                 child: state is AuthLoading

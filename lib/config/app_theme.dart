@@ -13,6 +13,8 @@ class AppTheme {
       GoogleFonts.openSans(color: AppColor.redColor);
   static TextStyle whiteTextStyle =
       GoogleFonts.openSans(color: AppColor.backgroundColor);
+  static TextStyle greyTextStyle =
+      GoogleFonts.openSans(color: AppColor.greyColor);
 
   static FontWeight light = FontWeight.w300;
   static FontWeight regular = FontWeight.w400;

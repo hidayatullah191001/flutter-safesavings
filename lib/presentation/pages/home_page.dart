@@ -10,7 +10,7 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   ScrollController _scrollController = ScrollController();
   bool _isScrolled = false;
-
+  int selectedIndex = 0;
   @override
   void initState() {
     super.initState();
@@ -29,262 +29,245 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(_isScrolled);
-    return Scaffold(
-      body: BlocBuilder<AuthBloc, AuthState>(
-        builder: (context, state) {
-          if (state is AuthSuccess) {
-            return SafeArea(
-              child: CustomScrollView(
-                controller: _scrollController,
-                slivers: [
-                  SliverAppBar(
-                    expandedHeight: 250.0,
-                    floating: false,
-                    pinned: true,
-                    elevation: _isScrolled ? 4 : 0,
-                    backgroundColor: _isScrolled
-                        ? AppColor.backgroundColor
-                        : Colors.transparent,
-                    title: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        if (state is AuthSuccess) {
+          return SafeArea(
+            child: CustomScrollView(
+              controller: _scrollController,
+              slivers: [
+                SliverToBoxAdapter(
+                  child: SizedBox(
+                    height: 300,
+                    child: _head(state.user),
+                  ),
+                ),
+                SliverToBoxAdapter(
+                  child: Container(
+                    margin: const EdgeInsets.only(
+                      left: 12,
+                      right: 12,
+                      top: 30,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              'Hi,',
-                              style: _isScrolled
-                                  ? AppTheme.blackTextStyle.copyWith(
-                                      fontSize: 14,
-                                    )
-                                  : AppTheme.whiteTextStyle.copyWith(
-                                      fontSize: 14,
-                                    ),
-                            ),
-                            Text(
-                              state.user.name.toString(),
-                              style: _isScrolled
-                                  ? AppTheme.blackTextStyle.copyWith(
-                                      fontSize: 14,
-                                      fontWeight: AppTheme.bold,
-                                    )
-                                  : AppTheme.whiteTextStyle.copyWith(
-                                      fontSize: 16,
-                                      fontWeight: AppTheme.bold,
-                                    ),
-                            ),
-                          ],
-                        ),
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundImage: NetworkImage(
-                            state.user.profilePhotoUrl.toString(),
+                        Text(
+                          'Kategori Transaksi',
+                          style: AppTheme.blackTextStyle.copyWith(
+                            fontWeight: AppTheme.bold,
+                            fontSize: 16,
                           ),
-                        )
+                        ),
+                        const SizedBox(
+                          height: 8,
+                        ),
+                        SizedBox(
+                          height: 40,
+                          width: double.infinity,
+                          child: BlocProvider(
+                            create: (context) =>
+                                CategoryBloc()..add(CategoryGetAllData()),
+                            child: BlocBuilder<CategoryBloc, CategoryState>(
+                              builder: (context, state) {
+                                CategoryModel manualData = CategoryModel(
+                                    id: 0,
+                                    name: 'Semua',
+                                    createdAt: '',
+                                    updatedAt: '');
+                                if (state is CategorySuccess) {
+                                  List<CategoryModel> combinedData =
+                                      List.from(state.categoryModel);
+                                  combinedData.insert(0, manualData);
+                                  return ListView.builder(
+                                    shrinkWrap: true,
+                                    scrollDirection: Axis.horizontal,
+                                    itemCount: combinedData.length,
+                                    itemBuilder: (ctx, index) {
+                                      return CategoryItem(
+                                        data: combinedData[index],
+                                        index: index,
+                                        isSelected: index == selectedIndex
+                                            ? true
+                                            : false,
+                                        onTap: () {
+                                          setState(() {
+                                            selectedIndex = index;
+                                          });
+                                        },
+                                      );
+                                    },
+                                  );
+                                }
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  scrollDirection: Axis.horizontal,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: 5,
+                                  itemBuilder: (context, index) {
+                                    return const CategoryItemShimmer();
+                                  },
+                                );
+                              },
+                            ),
+                          ),
+                        ),
+                        const SizedBox(
+                          height: 15,
+                        ),
+                        Text(
+                          'Trancastion Terakhir',
+                          style: AppTheme.blackTextStyle.copyWith(
+                            fontWeight: AppTheme.bold,
+                            fontSize: 16,
+                          ),
+                        ),
+                        BlocProvider(
+                          create: (context) =>
+                              TransactionBloc()..add(TransactionGetAllData()),
+                          child: BlocBuilder<TransactionBloc, TransactionState>(
+                            builder: (context, state) {
+                              if (state is TransactionSuccess) {
+                                return Column(
+                                  children: state.transactionModel
+                                      .map((transaction) => TransactionItem(
+                                            data: transaction,
+                                          ))
+                                      .toList(),
+                                );
+                              }
+                              return ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: 5,
+                                itemBuilder: (context, index) {
+                                  return const TransactionItemShimmer();
+                                },
+                              );
+                            },
+                          ),
+                        ),
                       ],
                     ),
-                    flexibleSpace: FlexibleSpaceBar(
-                      background: Container(
-                        height: 200,
-                        decoration: const BoxDecoration(
-                          borderRadius: BorderRadius.only(
-                            bottomLeft: Radius.circular(25),
-                            bottomRight: Radius.circular(25),
-                          ),
-                          image: DecorationImage(
-                            image: AssetImage(AppAsset.homeBackground),
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.only(
-                              top: 85, left: 15, right: 15, bottom: 20),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Container(
-                                height: 150,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 20,
-                                  horizontal: 15,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColor.backgroundColor,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.south_west,
-                                          size: 15,
-                                          color: AppColor.greenColor,
-                                        ),
-                                        Text(
-                                          'Pemasukan',
-                                          style: AppTheme.blackTextStyle,
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      AppMethods.currency('200000'),
-                                      style: AppTheme.greenTextStyle.copyWith(
-                                        fontSize: 20,
-                                        fontWeight: AppTheme.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                    CustomButton(
-                                      title: '+ Tambah',
-                                      onTap: () {},
-                                    ),
-                                  ],
-                                ),
-                              ),
-                              const SizedBox(
-                                width: 5,
-                              ),
-                              Container(
-                                height: 150,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 20,
-                                  horizontal: 15,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppColor.backgroundColor,
-                                  borderRadius: BorderRadius.circular(15),
-                                ),
-                                child: Column(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        const Icon(
-                                          Icons.north_east,
-                                          size: 15,
-                                          color: AppColor.redColor,
-                                        ),
-                                        Text(
-                                          'Pengeluaran',
-                                          style: AppTheme.blackTextStyle,
-                                        ),
-                                      ],
-                                    ),
-                                    Text(
-                                      AppMethods.currency('200000'),
-                                      style: AppTheme.redTextStyle.copyWith(
-                                        fontSize: 20,
-                                        fontWeight: AppTheme.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(
-                                      height: 15,
-                                    ),
-                                    CustomButton(
-                                      title: '+ Tambah',
-                                      onTap: () {},
-                                      type: ButtonType.red,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ],
-                          ),
+                  ),
+                ),
+              ],
+            ),
+          );
+        }
+        return Container();
+      },
+    );
+  }
+
+  Widget _head(UserModel user) {
+    return Stack(
+      children: [
+        Column(
+          children: [
+            Container(
+              width: double.infinity,
+              height: 200,
+              decoration: const BoxDecoration(
+                color: AppColor.homeBackgroundColor,
+                borderRadius: BorderRadius.only(
+                  bottomLeft: Radius.circular(20),
+                  bottomRight: Radius.circular(20),
+                ),
+              ),
+              child: Stack(
+                children: [
+                  Positioned(
+                    top: 20,
+                    left: MediaQuery.of(context).size.width * 0.85,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(7),
+                      child: Container(
+                        width: 40,
+                        height: 40,
+                        color: AppColor.secondaryColor,
+                        child: Image.network(
+                          user.profilePhotoUrl.toString(),
+                          fit: BoxFit.cover,
                         ),
                       ),
                     ),
                   ),
-                  SliverToBoxAdapter(
+                  Padding(
+                    padding: const EdgeInsets.only(
+                      top: 20,
+                      left: 10,
+                    ),
                     child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
-                        Text('Hello World'),
+                        Text(
+                          'Selamat Sore',
+                          style: AppTheme.whiteTextStyle.copyWith(
+                            fontSize: 14,
+                          ),
+                        ),
+                        Text(
+                          user.name.toString(),
+                          style: AppTheme.whiteTextStyle.copyWith(
+                            fontSize: 18,
+                            fontWeight: AppTheme.bold,
+                          ),
+                        ),
                       ],
                     ),
-                  ),
+                  )
                 ],
               ),
-            );
-          }
-          return Container();
-        },
-      ),
-      bottomNavigationBar: BottomNavigationBar(items: [
-        BottomNavigationBarItem(
-          icon: Icon(Icons.dashboard),
+            ),
+          ],
         ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.south_west),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.north_east),
-        ),
-        BottomNavigationBarItem(
-          icon: Icon(Icons.category),
-        ),
-      ]),
+        Positioned(
+          top: 120,
+          left: 37,
+          child: Container(
+            height: 170,
+            width: MediaQuery.of(context).size.width * 0.8,
+            decoration: BoxDecoration(
+              boxShadow: const [
+                BoxShadow(
+                  color: Color.fromARGB(155, 42, 50, 125),
+                  offset: Offset(0, 8),
+                  blurRadius: 12,
+                  spreadRadius: 6,
+                ),
+              ],
+              borderRadius: BorderRadius.circular(15),
+              image: const DecorationImage(
+                image: AssetImage(
+                  AppAsset.homeBackground,
+                ),
+                fit: BoxFit.cover,
+              ),
+            ),
+            child: BlocProvider(
+              create: (context) =>
+                  TransactionBloc()..add(TransactionGetTotalAmount()),
+              child: BlocBuilder<TransactionBloc, TransactionState>(
+                builder: (context, state) {
+                  if (state is TransactionSuccessAmount) {
+                    double totalPemasukan =
+                        double.parse(state.amount['total_pemasukan']);
+                    double totalPengeluaran =
+                        double.parse(state.amount['total_pengeluaran']);
+                    double totalAmount = totalPemasukan - totalPengeluaran;
+                    return CardInfo(
+                      totalAmount: totalAmount,
+                      totalPemasukan: totalPemasukan,
+                      totalPengeluaran: totalPengeluaran,
+                    );
+                  }
+                  return const CardInfoShimmer();
+                },
+              ),
+            ),
+          ),
+        )
+      ],
     );
   }
 }

@@ -22,7 +22,7 @@ class _SplashPageState extends State<SplashPage> {
             Timer(
               const Duration(seconds: 3),
               () => Navigator.pushNamedAndRemoveUntil(
-                  context, '/home', (route) => false),
+                  context, '/main', (route) => false),
             );
           }
           if (state is AuthFailed) {

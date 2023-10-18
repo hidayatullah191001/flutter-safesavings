@@ -5,12 +5,14 @@ class CustomButton extends StatelessWidget {
   final VoidCallback onTap;
   final double width;
   final ButtonType type;
+  final double padding;
   const CustomButton({
     Key? key,
     required this.title,
     required this.onTap,
     this.width = 0,
     this.type = ButtonType.green,
+    this.padding = 10,
   }) : super(key: key);
 
   @override
@@ -30,7 +32,7 @@ class CustomButton extends StatelessWidget {
           onTap: onTap,
           borderRadius: BorderRadius.circular(15),
           child: Padding(
-            padding: const EdgeInsets.all(10.0),
+            padding: EdgeInsets.all(padding),
             child: Center(
               child: Text(
                 title,

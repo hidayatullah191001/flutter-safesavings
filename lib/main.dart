@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:safesavings/blocs/auth/auth_bloc.dart';
+import 'package:safesavings/blocs/transaction/transaction_bloc.dart';
 import 'package:safesavings/presentation/pages/pages.dart';
 
 void main() {
@@ -16,8 +17,12 @@ class MyApp extends StatelessWidget {
         BlocProvider(
           create: (context) => AuthBloc()..add(AuthGetCurrentUser()),
         ),
+        BlocProvider(
+          create: (context) => TransactionBloc(),
+        ),
       ],
       child: MaterialApp(
+        debugShowCheckedModeBanner: false,
         title: 'SafeSavings',
         initialRoute: '/',
         routes: {
@@ -25,6 +30,8 @@ class MyApp extends StatelessWidget {
           '/login': (context) => const LoginPage(),
           '/register': (context) => const RegisterPage(),
           '/home': (context) => const HomePage(),
+          '/main': (context) => const MainPage(),
+          '/transaction-add': (context) => const TransactionAddPage(),
         },
       ),
     );
