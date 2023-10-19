@@ -7,7 +7,13 @@ abstract class TransactionEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class TransactionGetAllData extends TransactionEvent {}
+class TransactionGetAllData extends TransactionEvent {
+  final String type;
+  const TransactionGetAllData({required this.type});
+
+  @override
+  List<Object> get props => [type];
+}
 
 class TransactionGetTotalAmount extends TransactionEvent {}
 
@@ -17,4 +23,13 @@ class TransactionPostNewData extends TransactionEvent {
 
   @override
   List<Object> get props => [data];
+}
+
+class FetchDataForNextPageEvent extends TransactionEvent {
+  final int page;
+  final String type;
+  const FetchDataForNextPageEvent(this.page, {required this.type});
+
+  @override
+  List<Object> get props => [page, type];
 }

@@ -25,4 +25,20 @@ class AppMethods {
       isDismissible: false,
     ).show(context);
   }
+
+  static String getGreeting(int currentTime) {
+    String greeting = '';
+
+    if (currentTime >= 5 && currentTime < 12) {
+      greeting = 'Pagi';
+    } else if (currentTime >= 12 && currentTime < 17) {
+      greeting = 'Siang';
+    } else if (currentTime >= 17 && currentTime < 20) {
+      greeting = 'Sore';
+    } else {
+      greeting = 'Malam';
+    }
+
+    return greeting;
+  }
 }

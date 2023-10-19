@@ -23,7 +23,7 @@ class UserModel {
     roles = json['roles'];
     createdAt = json['created_at'].toString();
     updatedAt = json['updated_at'].toString();
-    profilePhotoUrl = json['profile_photo_url'];
+    profilePhotoUrl = json['profile_photo_url'].toString();
   }
 
   Map<String, dynamic> toJson() {

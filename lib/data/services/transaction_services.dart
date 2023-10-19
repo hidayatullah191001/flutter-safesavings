@@ -1,17 +1,47 @@
 part of 'services.dart';
 
 class TransactionServices {
-  static Future<List<TransactionModel>> getDataTrasanction() async {
+  static Future<Map<String, dynamic>> getDataTrasanction(
+      {required String type}) async {
     String token = await AppSession.getToken();
     Map? responseBody = await APIRequest.gets(
-      API.transaction,
+      type == '' ? API.transaction : '${API.transaction}?type=$type',
       headers: {'Authorization': 'Bearer $token'},
     );
-    if (responseBody == null) return [];
+    if (responseBody == null) return {};
 
     if (responseBody['meta']['code'] == 200) {
-      return List<TransactionModel>.from(responseBody['data']['data']
-          .map((json) => TransactionModel.fromJson(json))).toList();
+      Map<String, dynamic> data = {
+        'current_page': responseBody['data']['current_page'],
+        'last_page': responseBody['data']['last_page'],
+        'transaction': List<TransactionModel>.from(responseBody['data']['data']
+            .map((json) => TransactionModel.fromJson(json))).toList()
+      };
+      return data;
+    } else {
+      throw responseBody['meta']['message'];
+    }
+  }
+
+  static Future<Map<String, dynamic>> fetchDataForNextPage(int page,
+      {required String type}) async {
+    String token = await AppSession.getToken();
+    Map? responseBody = await APIRequest.gets(
+      type == ''
+          ? '${API.transaction}?page=$page'
+          : '${API.transaction}?type=$type&page=$page',
+      headers: {'Authorization': 'Bearer $token'},
+    );
+    if (responseBody == null) return {};
+
+    if (responseBody['meta']['code'] == 200) {
+      var data = {
+        'current_page': responseBody['data']['current_page'],
+        'last_page': responseBody['data']['last_page'],
+        'transaction': List<TransactionModel>.from(responseBody['data']['data']
+            .map((json) => TransactionModel.fromJson(json))).toList()
+      };
+      return data;
     } else {
       throw responseBody['meta']['message'];
     }
@@ -32,7 +62,7 @@ class TransactionServices {
     }
   }
 
-  static Future<TransactionModel> postNewData(TransactionForm value) async {
+  static Future<Map<String, dynamic>> postNewData(TransactionForm value) async {
     String token = await AppSession.getToken();
     Map? responseBody = await APIRequest.post(
       API.transaction,
@@ -44,7 +74,7 @@ class TransactionServices {
     if (responseBody == null) throw 'Kosong';
     if (responseBody['meta']['status'] == 'success') {
       var data = responseBody['data'];
-      return TransactionModel.fromJson(data);
+      return data;
     }
     throw 'Something went wrong';
   }

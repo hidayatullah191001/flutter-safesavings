@@ -1,5 +1,5 @@
 class TransactionForm {
-  final int? categoryId;
+  final String? categoryId;
   final String? type;
   final String? title;
   final String? description;
@@ -17,7 +17,7 @@ class TransactionForm {
 
   Map<String, dynamic> toJson() {
     return {
-      'category_id': categoryId.toString(),
+      'category_id': categoryId,
       'type': type,
       'title': title,
       'description': description,

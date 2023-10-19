@@ -32,6 +32,7 @@ class MyApp extends StatelessWidget {
           '/home': (context) => const HomePage(),
           '/main': (context) => const MainPage(),
           '/transaction-add': (context) => const TransactionAddPage(),
+          '/transaction-all': (context) => const TransactionAllPage(),
         },
       ),
     );

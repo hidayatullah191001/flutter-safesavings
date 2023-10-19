@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:animated_bottom_navigation_bar/animated_bottom_navigation_bar.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:d_info/d_info.dart';
 import 'package:d_method/d_method.dart';
 import 'package:email_validator/email_validator.dart';
@@ -32,3 +33,4 @@ part 'pengeluaran_page.dart';
 part 'category_page.dart';
 part 'main_page.dart';
 part 'transaction_add_page.dart';
+part 'transaction_all_page.dart';

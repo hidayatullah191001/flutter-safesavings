@@ -32,6 +32,9 @@ class _HomePageState extends State<HomePage> {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
         if (state is AuthSuccess) {
+          final now = DateTime.now();
+          final currentTime = now.hour;
+          String greeting = AppMethods.getGreeting(currentTime);
           return SafeArea(
             child: CustomScrollView(
               controller: _scrollController,
@@ -39,7 +42,7 @@ class _HomePageState extends State<HomePage> {
                 SliverToBoxAdapter(
                   child: SizedBox(
                     height: 300,
-                    child: _head(state.user),
+                    child: _head(state.user, greeting),
                   ),
                 ),
                 SliverToBoxAdapter(
@@ -115,25 +118,45 @@ class _HomePageState extends State<HomePage> {
                         const SizedBox(
                           height: 15,
                         ),
-                        Text(
-                          'Trancastion Terakhir',
-                          style: AppTheme.blackTextStyle.copyWith(
-                            fontWeight: AppTheme.bold,
-                            fontSize: 16,
-                          ),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Trancastion Terakhir',
+                              style: AppTheme.blackTextStyle.copyWith(
+                                fontWeight: AppTheme.bold,
+                                fontSize: 16,
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                Navigator.pushNamed(
+                                  context,
+                                  '/transaction-all',
+                                );
+                              },
+                              child: Text(
+                                'Lihat Semua',
+                                style: AppTheme.primaryTextStyle,
+                              ),
+                            ),
+                          ],
                         ),
                         BlocProvider(
-                          create: (context) =>
-                              TransactionBloc()..add(TransactionGetAllData()),
+                          create: (context) => TransactionBloc()
+                            ..add(const TransactionGetAllData(type: '')),
                           child: BlocBuilder<TransactionBloc, TransactionState>(
                             builder: (context, state) {
                               if (state is TransactionSuccess) {
-                                return Column(
-                                  children: state.transactionModel
-                                      .map((transaction) => TransactionItem(
-                                            data: transaction,
-                                          ))
-                                      .toList(),
+                                return ListView.builder(
+                                  shrinkWrap: true,
+                                  physics: const NeverScrollableScrollPhysics(),
+                                  itemCount: state.data['transaction'].length,
+                                  itemBuilder: (context, index) {
+                                    return TransactionItem(
+                                      data: state.data['transaction'][index],
+                                    );
+                                  },
                                 );
                               }
                               return ListView.builder(
@@ -159,7 +182,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  Widget _head(UserModel user) {
+  Widget _head(UserModel user, String greeting) {
     return Stack(
       children: [
         Column(
@@ -182,12 +205,16 @@ class _HomePageState extends State<HomePage> {
                     child: ClipRRect(
                       borderRadius: BorderRadius.circular(7),
                       child: Container(
-                        width: 40,
                         height: 40,
+                        width: 40,
                         color: AppColor.secondaryColor,
-                        child: Image.network(
-                          user.profilePhotoUrl.toString(),
-                          fit: BoxFit.cover,
+                        child: CachedNetworkImage(
+                          imageUrl: user.profilePhotoUrl!,
+                          placeholder: (context, url) => const Icon(
+                              Icons.person,
+                              color: AppColor.primaryColor),
+                          errorWidget: (context, url, error) =>
+                              const Icon(Icons.error),
                         ),
                       ),
                     ),
@@ -201,7 +228,7 @@ class _HomePageState extends State<HomePage> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Selamat Sore',
+                          'Selamat $greeting',
                           style: AppTheme.whiteTextStyle.copyWith(
                             fontSize: 14,
                           ),

@@ -29,4 +29,9 @@ class AppSession {
     pref.remove('token');
     return true;
   }
+
+  static Future<bool> saveDataToStorage(dynamic data, String key) async {
+    final pref = await SharedPreferences.getInstance();
+    return await pref.setString(key, data);
+  }
 }

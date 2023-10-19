@@ -29,7 +29,7 @@ class _TransactionAddPageState extends State<TransactionAddPage> {
       context.read<TransactionBloc>().add(
             TransactionPostNewData(
               TransactionForm(
-                categoryId: idCategorySelected,
+                categoryId: idCategorySelected.toString(),
                 type: tipeController.text,
                 title: titleController.text,
                 description: descriptionController.text,
